@@ -17,7 +17,7 @@ const createTable = async () => {
       
         await db.sync({force : true})
     } catch (error) {
-        console.log(error)
+        
     }
 }
 
@@ -25,6 +25,7 @@ const app = require("./app");
 
 
  createTable();
-app.listen(8000,()=>{
-    console.log("Server start");
+const PORT = process.env.PORT || 8000
+app.listen(PORT,()=>{
+    
 })
