@@ -15,7 +15,9 @@ const RoutePackege = require("./Routes/PackegeRoute")
 
 app.use('/api/v1/users',RouteUser);
 app.use("/api/v1/packege",RoutePackege);
-
+app.get("/",(req,res)=>{
+    res.send("hello word");
+})
 
 app.all('*',(req,res,next)=>{
 next(new Errorapi(`This Url ${req.originalUrl} doesn't exist`,404));
