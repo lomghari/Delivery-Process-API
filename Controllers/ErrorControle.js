@@ -54,9 +54,9 @@ const ErrorToSendProd = (err,res) =>{
 
 
 
-// const ErrorRequireField = (err)=>{
-//   err.error.map(el => el.message)
-// }
+const ErrorRequireField = (err)=>{
+  err.error.map(el => el.message)
+}
 
 
 
@@ -71,14 +71,14 @@ exports.GlobalErrorHandler = (err,req,res,next) => {
     }
     else if(process.env.NODE_ENV === "production"){
       let error = Object.assign(err);
-      // if(error.name === "CastError") error = HandlingCatchRongId(error);
+      if(error.name === "CastError") error = HandlingCatchRongId(error);
       if(error.original.sqlState == 23000){
            error = HandlingDuplicatioError(error);
       } 
         
-      // if(error.name === "ValidationError") error = HandlingValidation(error);
-      // if(error.name === "JsonWebTokenError") error = HandlingJWTError();
-      // if(error.name === "TokenExpiredError") error= HandlingJWTExpiration();
+      if(error.name === "ValidationError") error = HandlingValidation(error);
+      if(error.name === "JsonWebTokenError") error = HandlingJWTError();
+      if(error.name === "TokenExpiredError") error= HandlingJWTExpiration();
       ErrorToSendProd(error,res);
     }
     }
