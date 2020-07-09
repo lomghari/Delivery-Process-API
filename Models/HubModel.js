@@ -1,28 +1,51 @@
 const Sequelize = require("sequelize");
-const db = require("../Util/Database");
+const sequelize = require("../Util/Database");
 
 
-const Hub = db.define("hub", 
-{
+class Hub extends Sequelize.Model{}
+
+
+Hub.init({
     id : 
-    {
-        type : Sequelize.INTEGER,
-        autoIncrument : true,
-        allowNull: false,
-        primaryKey : true
-    },
-    hubname:
-    {
-        type: Sequelize.STRING,
-        allowNull : false,
-        unique: 'compositeIndex'
-    },
-     hubcity:{
-         type : Sequelize.STRING,
-         allowNull: false
-     }
+        {
+            type : Sequelize.INTEGER,
+            autoIncrument : true,
+            allowNull: false,
+            primaryKey : true
+        },
+        hubname:
+        {
+            type: Sequelize.STRING,
+            allowNull : false,
+            unique: 'compositeIndex'
+        },
+         hubcity:
+         {
+             type : Sequelize.STRING,
+         }
+},{sequelize,modelName:"Hub"});
 
-});
+// const Hub = db.define("Hub", 
+// {
+//     id : 
+//     {
+//         type : Sequelize.INTEGER,
+//         autoIncrument : true,
+//         allowNull: false,
+//         primaryKey : true
+//     },
+//     hubname:
+//     {
+//         type: Sequelize.STRING,
+//         allowNull : false,
+//         unique: 'compositeIndex'
+//     },
+//      hubcity:{
+//          type : Sequelize.STRING,
+//          allowNull: false
+//      }
+
+// });
 
 
 module.exports = Hub;

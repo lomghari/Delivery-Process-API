@@ -29,6 +29,14 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
 
 
  const token = await SignToken(newUser.username)
+   res.cookie("jwt",token,{
+     expires :  new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    //  secure : true,
+     httpOnly : true
+   })
+
+   newUser.password = undefined;
+
  res.status(201).
     json
     ({
@@ -57,7 +65,18 @@ exports.LogIn = ErorrCache.ErrorCatchre(async(req,res,next)=>{
   if(!user || !inCorrect){
     return next(new Errors("In found email or icorect password",401));
 }
-  const token = await SignToken(user.username)
+
+
+const token = await SignToken(newUser.username)
+res.cookie("jwt",token,{
+  expires :  new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+ //  secure : true,
+  httpOnly : true
+})
+
+
+
+
   res.status(200).
   json
   ({
@@ -68,25 +87,26 @@ exports.LogIn = ErorrCache.ErrorCatchre(async(req,res,next)=>{
 
 exports.Checker = ErorrCache.ErrorCatchre(async(req,res,next) => 
 {
-  if(!req.headers.authorization || !req.headers.authorization.startsWith("Bearer")){
-      return next(new Errors("Invalid token , Please login again",401));
-  }
+  // if(!req.headers.authorization || !req.headers.authorization.startsWith("Bearer")){
+  //     return next(new Errors("Invalid token , Please login again",401));
+  // }
 
-  const token = req.headers.authorization.split(" ")[1];
+  // const token = req.headers.authorization.split(" ")[1];
 
-  if(!token){
-      return  next(new Errors("Your token has expired! Please log in again", 401));
-  }
+  // if(!token){
+  //     return  next(new Errors("Your token has expired! Please log in again", 401));
+  // }
 
-  const decode = await util.promisify(JWT.verify)(token,process.env.JWT_SICRIT);
-  const user = await User.findAll({where : {username : req.body.username}});
-    if(!user){
-        return next(new Errors("This dosen't exist in more!",401));
-    }
+  // const decode = await util.promisify(JWT.verify)(token,process.env.JWT_SICRIT);
+  const user = await User.findOne({where : {id : 1}});
+   
+    // if(!user){
+    //     return next(new Errors("This dosen't exist in more!",401));
+    // }
 
-    if(user.PassWordChanged(decode.iat)){
-        return next(new Errors("Password Change,Please Login Again!",401));
-    }
+    // if(user.PassWordChanged(decode.iat)){
+    //     return next(new Errors("Password Change,Please Login Again!",401));
+    // }
   
   req.user = user
  next();

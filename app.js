@@ -13,7 +13,7 @@ app.use(compression());
 const RouteUser = require("./Routes/UserRoute");
 const RoutePackege = require("./Routes/PackegeRoute")
 
-app.get("/yassine",(req,res)=>{
+app.get("/",(req,res)=>{
     res.send("hello word");
 })
 app.use('/api/v1/users',RouteUser);
