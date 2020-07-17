@@ -18,10 +18,12 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
     const username = req.body.username;
     const fullname = req.body.fullname;
     const role = req.body.role;
+    const email = req.body.email;
     const password = await bcrypt.hash(req.body.password,12);
     const newUser = await User.create
     ({
         Username: username,
+        Email : email,
         Full_Name: fullname,
         Password:password,
         Role:role
