@@ -21,10 +21,10 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
     const password = await bcrypt.hash(req.body.password,12);
     const newUser = await User.create
     ({
-        username: username,
-        fullname: fullname,
-        password:password,
-        role:role
+        Username: username,
+        Full_Name: fullname,
+        Password:password,
+        Role:role
     });
 
 
@@ -41,11 +41,7 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
     json
     ({
         status : "Success",
-        token,
-        data : 
-        {
-            newUser
-        }
+        newUser
     })
 });
 
@@ -74,15 +70,10 @@ res.cookie("jwt",token,{
   httpOnly : true
 })
 
-
-
-
   res.status(200).
   json
   ({
     status : "Success",
-    token,
-    data:user
   })
 });
 
@@ -123,86 +114,86 @@ exports.Pasport = (...roles) => {
 }
 
 
-// exports.PasswordForgot = ErorrCache.ErrorCatchre(async(req,res,next)=>{
-//     const user = await Users.findOne({email:req.body.email});
-//     if(!user){
-//         return next(new Errors("User Didnt Found!!!",404));
-//     }
+exports.PasswordForgot = ErorrCache.ErrorCatchre(async(req,res,next)=>{
+    const user = await Users.findOne({email:req.body.email});
+    if(!user){
+        return next(new Errors("User Didnt Found!!!",404));
+    }
 
   
 
-//          const resetToken = user.createPasswordResetToken();
-//          await user.save({validateBeforeSave:false});
+         const resetToken = user.createPasswordResetToken();
+         await user.save({validateBeforeSave:false});
         
-//         const RestURL = `${req.protocol}://${req.get("host")}/api/V1/users/resetpassword/${resetToken}`;
-//         const message = `Hello ${user.username} click on this link : ${RestURL} for Reset Your compte If you forgot your Password Please D'ont do this !`
-//         try{   
-//              await EmailSender({
-//              email:user.email,
-//              subject: "Reset Your PassWord",
-//              message
-//          })        
+        const RestURL = `${req.protocol}://${req.get("host")}/api/V1/users/resetpassword/${resetToken}`;
+        const message = `Hello ${user.username} click on this link : ${RestURL} for Reset Your compte If you forgot your Password Please D'ont do this !`
+        try{   
+             await EmailSender({
+             email:user.email,
+             subject: "Reset Your PassWord",
+             message
+         })        
         
-//         res.status(200)
-//         .json({
-//             status: "Success",
-//             message: "Cheke Your Email",
-//         });
-//     }
-//     catch(err)
-//     {
-//         user.passwordResetToken = undefined;
-//         user.passwordResetTokenExp = undefined;
-//         await user.save({validateBeforeSave:false});
-//         next(new Errors(`Some Thing wrong With This Request ${err}`,500));
-//     }
+        res.status(200)
+        .json({
+            status: "Success",
+            message: "Cheke Your Email",
+        });
+    }
+    catch(err)
+    {
+        user.passwordResetToken = undefined;
+        user.passwordResetTokenExp = undefined;
+        await user.save({validateBeforeSave:false});
+        next(new Errors(`Some Thing wrong With This Request ${err}`,500));
+    }
     
-// });
+});
 
-// exports.passwordReset = ErorrCache.ErrorCatchre(async(req,res,next) =>{
-//     const hashRestToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
+exports.passwordReset = ErorrCache.ErrorCatchre(async(req,res,next) =>{
+    const hashRestToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
 
-//     const user = await Users.findOne({passwordResetToken:hashRestToken , passwordResetTokenExp :{$gt: Date.now()}});
+    const user = await Users.findOne({passwordResetToken:hashRestToken , passwordResetTokenExp :{$gt: Date.now()}});
 
-//     if(!user){
-//         return next(new Errors("User Dosont Exist",400));
-//     }
+    if(!user){
+        return next(new Errors("User Dosont Exist",400));
+    }
     
-//     user.passwordConfirmation = req.body.passwordConfirmation;
-//     user.password = req.body.password;
-//     user.passwordResetToken = undefined;
-//     user.passwordResetTokenExp= undefined;
-//     await user.save();
+    user.passwordConfirmation = req.body.passwordConfirmation;
+    user.password = req.body.password;
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExp= undefined;
+    await user.save();
 
-//     const token = await SignToken(user._id)
-//     res.status(200).
-//     json
-//     ({
-//       status : "Success",
-//       token
-//     })
-// });
+    const token = await SignToken(user._id)
+    res.status(200).
+    json
+    ({
+      status : "Success",
+      token
+    })
+});
 
-// exports.UpdatePassword = ErorrCache.ErrorCatchre(async(req,res,next)=>{
-//     const user = await Users.findById(req.user.id).select("+password");
+exports.UpdatePassword = ErorrCache.ErrorCatchre(async(req,res,next)=>{
+    const user = await Users.findById(req.user.id).select("+password");
 
-//     if(!user.IsTheSame(req.body.currentPassword,user.password)){
-//         return next(new Errors("Password not Correct",400));
-//     }
+    if(!user.IsTheSame(req.body.currentPassword,user.password)){
+        return next(new Errors("Password not Correct",400));
+    }
 
 
-//     user.password = req.body.password;
-//     user.passwordConfirmation = req.body.passwordConfirmation;
+    user.password = req.body.password;
+    user.passwordConfirmation = req.body.passwordConfirmation;
 
-//     await user.save()
+    await user.save()
 
-//     const token = await SignToken(user._id)
-//     res.status(200).
-//     json
-//     ({
-//       status : "Success",
-//       token
-//     })
+    const token = await SignToken(user._id)
+    res.status(200).
+    json
+    ({
+      status : "Success",
+      token
+    })
 
    
-// })
+})

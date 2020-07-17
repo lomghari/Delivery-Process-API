@@ -1,116 +1,66 @@
-const Sequelize = require("sequelize");
-const sequelize  = require("../Util/Database");
+// const Sequelize = require("sequelize");
+// const sequelize  = require("../Util/Database");
 
 
-class Packege extends Sequelize.Model{}
+// class Packege extends Sequelize.Model{}
 
 
-Packege.init({
-    id:
-    {
-        type:Sequelize.INTEGER,
-        autoIncrement : true,
-        primaryKey : true,
-        allowNull : false
-    },
-
-    referance : 
-    {
-        type : Sequelize.STRING,
-        allowNull : false,
-    },
-    address : 
-    {
-        type : Sequelize.TEXT,
-        allowNull : false
-    },
-    city : 
-    {
-        type : Sequelize.STRING,
-        allowNull : false
-    },
-    code_postal : 
-    {
-        type: Sequelize.INTEGER,
-        allowNull : false
-    },
-    customer_name : 
-    {
-        type : Sequelize.STRING,
-        allowNull : false
-    },
-    phone_number : 
-    {
-        type : Sequelize.STRING,
-        allowNull : false
-    },
-    region : 
-    {
-        type: Sequelize.STRING,
-        allowNull : false
-    },
-    price : 
-    {
-        type : Sequelize.DOUBLE,
-        allowNull : false
-    }
-},{ sequelize , modelName:"Packege"})
-
-
-
-// const Packege = db.define("Packege",
-// {
-//     id:
+// Packege.init({
+//     Id:
 //     {
 //         type:Sequelize.INTEGER,
 //         autoIncrement : true,
 //         primaryKey : true,
 //         allowNull : false
 //     },
-
-//     referance : 
+//     Tracking_Number:
+//     {
+//         type: Sequelize.STRING,
+//         allowNull: true
+//     },
+//     Referance : 
 //     {
 //         type : Sequelize.STRING,
 //         allowNull : false,
 //     },
-//     address : 
+//     Address : 
 //     {
 //         type : Sequelize.TEXT,
 //         allowNull : false
 //     },
-//     city : 
+//     City : 
 //     {
 //         type : Sequelize.STRING,
 //         allowNull : false
 //     },
-//     code_postal : 
-//     {
-//         type: Sequelize.INTEGER,
-//         allowNull : false
-//     },
-//     customer_name : 
+//     Customer_Name : 
 //     {
 //         type : Sequelize.STRING,
 //         allowNull : false
 //     },
-//     phone_number : 
+//     Phone_Number : 
 //     {
 //         type : Sequelize.STRING,
 //         allowNull : false
 //     },
-//     region : 
+//     Customer: 
 //     {
 //         type: Sequelize.STRING,
 //         allowNull : false
 //     },
-//     price : 
+//     Price : 
 //     {
 //         type : Sequelize.DOUBLE,
 //         allowNull : false
-//     }
+//     },
+//     First_Provider:
+//     {
+//         type : Sequelize.INTEGER,
     
+//     } 
+// },{ sequelize , modelName:"Packege"})
 
-// });
 
 
-module.exports = Packege;
+
+// module.exports = Packege;

@@ -11,43 +11,33 @@ Upload.init({
         primaryKey : true,
         allowNull : false     
     },
-    fullpackege:
+    Shipment_Provider:
     {
         type : Sequelize.STRING,
-        allowNull : false,
-        unique : true
+        allowNull : false
     },
-    numberofpackege:
+    Total_Package:
     {
         type : Sequelize.INTEGER,
         allowNull : false
+    },
+    Status:{
+        type : Sequelize.STRING,
+        allowNull: false
+    },
+    Uploaded_By:{
+        type : Sequelize.INTEGER,
+        allowNull : false
     }
-},{sequelize,modelName:"Upload"})
+},
+    {
+        sequelize,
+        modelName:"Upload",
+        tableName:"Upload_History"
+    }
+)
 
 
-
-
-// const Upload = db.define("Upload",
-// {
-//     id:
-//     {
-//         type: Sequelize.INTEGER,
-//         autoIncrement : true,
-//         primaryKey : true,
-//         allowNull : false     
-//     },
-//     fullpackege:
-//     {
-//         type : Sequelize.STRING,
-//         allowNull : false,
-//         unique : true
-//     },
-//     numberofpackege:
-//     {
-//         type : Sequelize.INTEGER,
-//         allowNull : false
-//     }
-// });
 
 
 module.exports = Upload;
