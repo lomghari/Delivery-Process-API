@@ -8,8 +8,8 @@ const Errors = require("../Util/ErrorAPI");
 
 
 
-const SignToken = username => {
-    return JWT.sign({id : username},process.env.JWT_SICRIT,{expiresIn : process.env.JWT_TIMEOUT})
+const SignToken = id => {
+    return JWT.sign({id : id},process.env.JWT_SICRIT,{expiresIn : process.env.JWT_TIMEOUT})
 }
 
 
@@ -20,7 +20,7 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
     const role = req.body.role;
     const email = req.body.email;
     const password = await bcrypt.hash(req.body.password,12);
-    const newUser = await User.create
+    const newUser =  await User.create
     ({
         Username: username,
         Email : email,
@@ -30,45 +30,40 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
     });
 
 
- const token = await SignToken(newUser.username)
+ const token = await SignToken(newUser.id)
    res.cookie("jwt",token,{
      expires :  new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-    //  secure : true,
      httpOnly : true
    })
-
-   newUser.password = undefined;
 
  res.status(201).
     json
     ({
-        status : "Success",
-        newUser
+        status : "Success"
     })
 });
 
 
 exports.LogIn = ErorrCache.ErrorCatchre(async(req,res,next)=>{
-  const {username,password} = req.body;
+  const {email,password} = req.body;
 
-  if(!username || !password){
+  if(!email || !password){
       
     return next(new Errors("Email or Password Requird",400));
 }
   
-  const user = await User.findAll({where : {username : username}});
+  const user = await User.findOne({where : {email : email}});
  
-  const inCorrect = await bcrypt.compare(password,user[0].dataValues.password)
+  const inCorrect = await bcrypt.compare(password,user.password)
  
   if(!user || !inCorrect){
     return next(new Errors("In found email or icorect password",401));
 }
 
 
-const token = await SignToken(user.username)
+const token = await SignToken(user.id)
 res.cookie("jwt",token,{
   expires :  new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
- //  secure : true,
   httpOnly : true
 })
 
@@ -84,23 +79,22 @@ exports.Checker = ErorrCache.ErrorCatchre(async(req,res,next) =>
   // if(!req.headers.authorization || !req.headers.authorization.startsWith("Bearer")){
   //     return next(new Errors("Invalid token , Please login again",401));
   // }
+  let token = req.headers.cookie.split("; ").find(c => c.startsWith("jwt")).split("=")[1];
 
-  // const token = req.headers.authorization.split(" ")[1];
+  if(!token){
+      return  next(new Errors("Your token has expired! Please log in again", 401));
+  }
 
-  // if(!token){
-  //     return  next(new Errors("Your token has expired! Please log in again", 401));
-  // }
-
-  // const decode = await util.promisify(JWT.verify)(token,process.env.JWT_SICRIT);
-  const user = await User.findOne({where : {id : 1}});
+  const decode = await util.promisify(JWT.verify)(token,process.env.JWT_SICRIT);
+  const user = await User.findOne({where : {id : decode.id}});
    
-    // if(!user){
-    //     return next(new Errors("This dosen't exist in more!",401));
-    // }
+    if(!user){
+        return next(new Errors("This dosen't exist in more!",401));
+    }
 
-    // if(user.PassWordChanged(decode.iat)){
-    //     return next(new Errors("Password Change,Please Login Again!",401));
-    // }
+    if(user.PassWordChanged(decode.iat)){
+        return next(new Errors("Password Change,Please Login Again!",401));
+    }
   
   req.user = user
  next();
@@ -121,9 +115,6 @@ exports.PasswordForgot = ErorrCache.ErrorCatchre(async(req,res,next)=>{
     if(!user){
         return next(new Errors("User Didnt Found!!!",404));
     }
-
-  
-
          const resetToken = user.createPasswordResetToken();
          await user.save({validateBeforeSave:false});
         
