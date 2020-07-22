@@ -39,7 +39,8 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
  res.status(201).
     json
     ({
-        status : "Success"
+        status : "Success",
+        token
     })
 });
 
@@ -71,15 +72,16 @@ res.cookie("jwt",token,{
   json
   ({
     status : "Success",
+    token
   })
 });
 
 exports.Checker = ErorrCache.ErrorCatchre(async(req,res,next) => 
 {
-  // if(!req.headers.authorization || !req.headers.authorization.startsWith("Bearer")){
-  //     return next(new Errors("Invalid token , Please login again",401));
-  // }
-  let token = req.headers.cookie.split("; ").find(c => c.startsWith("jwt")).split("=")[1];
+  if(!req.headers.authorization || !req.headers.authorization.startsWith("Bearer")){
+      return next(new Errors("Invalid token , Please login again",401));
+  }
+  let token = req.headers.authorization.split(" ")[1];
 
   if(!token){
       return  next(new Errors("Your token has expired! Please log in again", 401));
@@ -92,11 +94,10 @@ exports.Checker = ErorrCache.ErrorCatchre(async(req,res,next) =>
         return next(new Errors("This dosen't exist in more!",401));
     }
 
-    if(user.PassWordChanged(decode.iat)){
-        return next(new Errors("Password Change,Please Login Again!",401));
-    }
-  
-  req.user = user
+    // if(user.PassWordChanged(decode.iat)){
+    //     return next(new Errors("Password Change,Please Login Again!",401));
+    // }
+  req.user = user.dataValues
  next();
 });
 
