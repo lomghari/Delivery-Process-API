@@ -45,16 +45,16 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
 
 
 exports.LogIn = ErorrCache.ErrorCatchre(async(req,res,next)=>{
+  
   const {email,password} = req.body;
-
   if(!email || !password){
       
     return next(new Errors("Email or Password Requird",400));
 }
   
-  const user = await User.findOne({where : {email : email}});
- 
-  const inCorrect = await bcrypt.compare(password,user.password)
+  const user = await User.findOne({where : {Email : email}});
+   
+  const inCorrect = await bcrypt.compare(password,user.dataValues.Password)
  
   if(!user || !inCorrect){
     return next(new Errors("In found email or icorect password",401));
