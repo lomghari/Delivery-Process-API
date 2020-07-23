@@ -44,14 +44,14 @@ const MonthString = (month) => {
 exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{     
     
      const Statu = req.body.Total_Failer_Packages === 0 ? "Seccess" : "Fail"
-     let pathfile 
-     if(req.body.Total_Failer_Packages > 0 ){
-         var wb = XLSX.utils.book_new()
-         var ws = XLSX.utils.json_to_sheet(req.body.Package_Logs)
-         XLSX.utils.book_append_sheet(wb,ws,"Log Data")
-         pathfile = `Logs/LogsFile${Date.now()}-${req.user.id}.xlsx`
-         XLSX.writeFile(wb,`Public/${pathfile}`)
-     }
+     let pathfile = "default"
+    //  if(req.body.Total_Failer_Packages > 0 ){
+    //      var wb = XLSX.utils.book_new()
+    //      var ws = XLSX.utils.json_to_sheet(req.body.Package_Logs)
+    //      XLSX.utils.book_append_sheet(wb,ws,"Log Data")
+    //      pathfile = `Logs/LogsFile${Date.now()}-${req.user.id}.xlsx`
+    //      XLSX.writeFile(wb,`Public/${pathfile}`)
+    //  }
 
      const Upload = await req.user.createUpload({
         Shipment_Provider_Id: req.body.Shipment_Provider_Id,
