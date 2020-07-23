@@ -97,7 +97,7 @@ exports.Checker = ErorrCache.ErrorCatchre(async(req,res,next) =>
     // if(user.PassWordChanged(decode.iat)){
     //     return next(new Errors("Password Change,Please Login Again!",401));
     // }
-  req.user = user.dataValues
+  req.user = user
  next();
 });
 

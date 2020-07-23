@@ -11,9 +11,9 @@ Upload.init({
         primaryKey : true,
         allowNull : false     
     },
-    Shipment_Provider:
+    Shipment_Provider_Id:
     {
-        type : Sequelize.STRING,
+        type : Sequelize.INTEGER,
         allowNull : false
     },
     Total_Package:
@@ -21,13 +21,24 @@ Upload.init({
         type : Sequelize.INTEGER,
         allowNull : false
     },
+    Total_Failer_Packages:
+    {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    Total_Seccess_Packages:
+    {
+       type: Sequelize.INTEGER,
+       allowNull: false
+    },
     Status:{
         type : Sequelize.STRING,
         allowNull: false
     },
-    Uploaded_By:{
-        type : Sequelize.INTEGER,
-        allowNull : false
+    LogsFile:
+    { 
+        type : Sequelize.STRING,
+        allowNull: true
     }
 },
     {

@@ -1,4 +1,5 @@
 const express = require("express");
+var path = require('path');
 const app = express();
 const morgan = require("morgan");
 const Errorapi = require("./Util/ErrorAPI");
@@ -7,6 +8,7 @@ const compression = require("compression");
 
 app.use(express.json());
 
+app.use("/public", express.static(path.join(__dirname, 'Public')));
 app.use(morgan());
 app.use(compression());
 

@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const XLSX = require("xlsx")
 const ErorrCache = require("../Util/ErrorCatch");
 const Errors = require("../Util/ErrorAPI");
 const Packege = require("../Models/PackegeModel");
@@ -42,11 +43,23 @@ const MonthString = (month) => {
 
 exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{     
     
+     const Statu = req.body.Total_Failer_Packages === 0 ? "Seccess" : "Fail"
+     let pathfile 
+     if(req.body.Total_Failer_Packages > 0 ){
+         var wb = XLSX.utils.book_new()
+         var ws = XLSX.utils.json_to_sheet(req.body.Package_Logs)
+         XLSX.utils.book_append_sheet(wb,ws,"Log Data")
+         pathfile = `Logs/LogsFile${Date.now()}-${req.user.id}.xlsx`
+         XLSX.writeFile(wb,`Public/${pathfile}`)
+     }
+
      const Upload = await req.user.createUpload({
-         Shipment_Provider: req.body.ShipmentProviderId,
-         Total_Package : req.body.TotalPackage,
-         Status: req.body.Status ,
-         Uploaded_By: req.user.id
+        Shipment_Provider_Id: req.body.Shipment_Provider_Id,
+        Total_Package: req.body.Total_Package,
+        Total_Failer_Packages: req.body.Total_Failer_Packages,
+        Total_Seccess_Packages: req.body.Total_Seccess_Packages,
+        Status: Statu,
+        LogsFile: `/public/${pathfile}`
      });
 
      const Package = await PackageInfo.findAll({ 
@@ -55,28 +68,23 @@ exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{
      })
     var Number
     var NumberString
+    var Today = new Date(Date.now())
     if(Package.length === 0){
        Number = 0
-    }
-
-    var Today = new Date(Date.now())
-   
-   if(new Date(Package[0].createdAt.getFullYear(), Package[0].createdAt.getMonth() ,Package[0].createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
+    }else if(new Date(Package[0].dataValues.createdAt.getFullYear(), Package[0].dataValues.createdAt.getMonth() ,Package[0].dataValues.createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
           Number = 0;
    }
         
    if(Package.length === 1){
        NumberString = `${Package[0].Tracking_Number}`.split("-")[1]
        Number = parseInt(NumberString.slice(-4)) + 1
-       console.log(NumberString)
-       console.log(Number)
    }
     const packagesInfoArr = []
-     req.body.packages.forEach(el => {
+     req.body.Package_Seccuss.forEach(el => {
          
          el.UserId = req.user.id
          el.Customer = req.user.id
-         el.First_Provider  = req.body.ShipmentProviderId
+         el.First_Provider  = req.body.Shipment_Provider_Id
          el.Tracking_Number = `DX-${Today.getFullYear()}${MonthString(Today.getMonth())}${MonthString(Today.getDate())}${ToforeNumberString(Number)}`
          packagesInfoArr.push(el)
          Number++
@@ -92,7 +100,7 @@ exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{
         PackageInfoResult.forEach(el => {
                var PackageObject = {}
                PackageObject.Package_id = el.id
-               PackageObject.Shipment_Provider = req.body.ShipmentProviderId
+               PackageObject.Shipment_Provider = req.body.Shipment_Provider_Id
                PackageObject.Package_Action = Actions.Action_Name
                PackageObject.Package_Workflow = Workflows.Workflow_Name
                PackageObject.Package_Status = Status.Status_Name
