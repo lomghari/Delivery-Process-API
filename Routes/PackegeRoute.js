@@ -5,9 +5,11 @@ const AuthControle = require("../Controllers/AuthControle");
 
 
 
-RoutePackege.route("/insertmany").post(AuthControle.Checker,PackegeControle.InsertPackeges);
+RoutePackege.route("/insertmany").post(AuthControle.Checker,PackegeControle.InsertPackeges,PackegeControle.InsertInDelivryAndHistory,PackegeControle.LogFileCreation,PackegeControle.Upload,PackegeControle.UploadRenderResponse);
 RoutePackege.route("/getLastUpdate").get(AuthControle.Checker,PackegeControle.getLastUploadlast)
-//RoutePackege.route("/getPackege").get(AuthControle.Checker,PackegeControle.getPakegesByUser)
+
+
+RoutePackege.route("/getpackege").get(AuthControle.Checker,PackegeControle.getPakeges,PackegeControle.RenderPackageSearch)
 
 
 module.exports = RoutePackege;

@@ -6,19 +6,13 @@ const ShipmentProvider = require("../Models/ShipmentProviderModel")
 
 
 exports.CreateHub = ErrorCatch.ErrorCatchre(async(req,res,next)=>{
-     const NewHub = await ShipmentProvider.create({
-         Provider_Name : req.body.name,
-         Address : req.body.address,
-         City:req.body.city,
-         Phone : req.body.phone
-     });
-
-     res.status(200).
-     json
-     ({
-       status : "Success",
-       NewHub
-     })
+    const NewHub = await ShipmentProvider.create(req.body);
+    res.status(200).
+    json
+    ({
+      status : "Success",
+      NewHub
+    }) 
 })
 
 

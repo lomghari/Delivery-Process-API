@@ -16,7 +16,7 @@ ShipmentProvider.init(
         Provider_Name : 
         {
             type : Sequelize.STRING,
-            allowNull : true,
+            allowNull : false,
             unique: true
         },
         Address:

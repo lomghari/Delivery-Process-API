@@ -16,7 +16,7 @@ PackagesInfo.init(
     Tracking_Number:
     {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     Referance : 
     {
@@ -43,11 +43,6 @@ PackagesInfo.init(
         type : Sequelize.STRING,
         allowNull : false
     },
-    Customer: 
-    {
-        type: Sequelize.INTEGER,
-        allowNull : false
-    },
     Price : 
     {
         type : Sequelize.DECIMAL(10,2),
@@ -57,7 +52,11 @@ PackagesInfo.init(
     {
         type : Sequelize.INTEGER,
     
-    } 
+    },
+    Prudoct: 
+    {
+        type : Sequelize.STRING
+    }
 },
 { 
     sequelize, 
@@ -67,7 +66,7 @@ PackagesInfo.init(
     [
         {
             unique:true,
-            fields:["Customer" , "Referance"]
+            fields:["Custumer" , "Referance"]
         }
     ]
  }

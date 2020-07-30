@@ -15,35 +15,6 @@ PackagesHistory.init(
            autoIncrement : true,
            primaryKey : true
        },
-       Package_id:
-       {
-           type : Sequelize.INTEGER,
-           allowNull : false
-       },
-       Shipment_Provider:
-       {
-           type: Sequelize.INTEGER
-       },
-       Package_Workflow:
-       {
-           type : Sequelize.STRING,
-           allowNull : false
-       },
-       Package_Status:
-       {
-           type : Sequelize.STRING,
-           allowNull : false
-       },
-       Package_Action:
-       {
-           type: Sequelize.STRING,
-           allowNull : false
-       },
-       Payment_Method:
-       {
-           type: Sequelize.STRING,
-           allowNull : false
-       },
        Amount_To_Collect:
        {
            type : Sequelize.DECIMAL(10,2),
@@ -73,7 +44,8 @@ PackagesHistory.init(
     {
         sequelize,
         modelName:"PackagesHistory",
-        tableName:"Packages_History"
+        tableName:"Packages_History",
+        updatedAt: false
     }
 )
 

@@ -15,5 +15,3 @@ exports.getUser =ErrorCatch.ErrorCatchre(async(req,res,next)=>{
             user
         })
 });
-
-

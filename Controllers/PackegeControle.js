@@ -3,48 +3,76 @@ const XLSX = require("xlsx")
 const ErorrCache = require("../Util/ErrorCatch");
 const Errors = require("../Util/ErrorAPI");
 const Packege = require("../Models/PackegeModel");
-const Upload = require("../Models/UploadModel")
 const PackageInfo = require("../Models/PackagesInfoModel")
 const PackageDelivery = require("../Models/PackagesDeliveryModel")
 const PackageHistory = require("../Models/PackagesHistoryModel")
-const PackageStatus = require("../Models/PackagesStatusModel")
-const Action = require("../Models/ActionModel")
-const Workflow = require("../Models/WorkflowModel")
-const ShipmentProvider = require("../Models/ShipmentProviderModel")
-const PaymentMethod = require("../Models/PaymentMethodModel");
+const Tracking = require("../Util/Tracking_Number");
+const { json } = require("sequelize");
 
 
-const ToforeNumberString = (number) => {
-    var numberString = number + ""
+exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{   
+    const PackagesInfoArr = []
+    req.body.Package_Seccuss.forEach(el => {    
+        el.First_Provider  = req.body.Shipment_Provider_Id
+        PackagesInfoArr.push(el)
+    });
 
-    switch(numberString.length){
-        case 1 : numberString = "000" + numberString
-        break;
-        case 2 : numberString = "00" + numberString
-        break;
-        case 3 : numberString = "0" + numberString
-        break;
-        case 4 : numberString = numberString
-        break
-    }
+    req.SuccessPackage = []
+    req.DuplicateArray = []
 
-    return numberString;
-}
+    PackagesInfoArr.forEach(async(el,i) => {
+        try {
+            const PackageInfoo = await req.user.createPackagesInfo(el)
+            req.SuccessPackage.push(PackageInfoo)
+        } 
+        catch (error) {
+            req.DuplicateArray.push(el)
+        }
+        
+        if(i === PackagesInfoArr.length - 1){
+            next();
+        }
+    })
 
-const MonthString = (month) => {
-    var monthStr = month + ""
-    if(monthStr.length == 1){
-        monthStr = "0" + monthStr
-    }
-
-    return monthStr
-}
-
-
-exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{     
     
-     const Statu = req.body.Total_Failer_Packages === 0 ? "Seccess" : "Fail"
-     let pathfile = "default"
+});
+
+exports.InsertInDelivryAndHistory = ErorrCache.ErrorCatchre(async(req,res,next) => {
+     if(req.SuccessPackage.length === 0){
+       return next();   
+     }
+
+     req.SuccessPackage.forEach(async(el,i)=>{
+         await el.createPackagesDelivery({
+            Shipment_Provider: req.body.Shipment_Provider_Id,
+            Amount_To_Collect: el.Price  
+         })
+
+         await el.createPackagesHistory({
+            Shipment_Provider: req.body.Shipment_Provider_Id,
+            Amount_To_Collect: el.Price 
+         })
+
+        if(i === req.SuccessPackage.length - 1){
+            next();
+        }
+     })
+    
+})
+
+
+exports.LogFileCreation = ErorrCache.ErrorCatchre(async (req,res,next) => {
+    if(req.DuplicateArray.length === 0 && req.body.Package_Logs.length === 0){
+        return next()
+    }
+
+    req.DuplicateArray.forEach(element => {
+        element.First_Provider = undefined
+        element.Tracking_Number = undefined
+        element.Logs = "Package Duplicated"
+    })
+    req.LogsArray = [...req.DuplicateArray,...req.body.Package_Logs]
+
     //  if(req.body.Total_Failer_Packages > 0 ){
     //      var wb = XLSX.utils.book_new()
     //      var ws = XLSX.utils.json_to_sheet(req.body.Package_Logs)
@@ -53,74 +81,77 @@ exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{
     //      XLSX.writeFile(wb,`Public/${pathfile}`)
     //  }
 
-     const Upload = await req.user.createUpload({
-        Shipment_Provider_Id: req.body.Shipment_Provider_Id,
-        Total_Package: req.body.Total_Package,
-        Total_Failer_Packages: req.body.Total_Failer_Packages,
-        Total_Seccess_Packages: req.body.Total_Seccess_Packages,
-        Status: Statu,
-        LogsFile: `/public/${pathfile}`
-     });
 
-     const Package = await PackageInfo.findAll({ 
+    next();
+});
+
+
+
+exports.Upload = ErorrCache.ErrorCatchre(async (req,res,next)=>{
+
+    const Upload = await req.user.createUpload({
+       Shipment_Provider_Id: req.body.Shipment_Provider_Id,
+       Total_Package: req.body.Total_Package,
+       Total_Failer_Packages: req.LogsArray.length,
+       Total_Seccess_Packages: req.SuccessPackage.length,
+       Status: req.LogsArray.length === 0 ? "Success" : "Fail"
+    });
+    
+    req.Upload = Upload
+  
+    if(req.SuccessPackage.length === 0){
+        return next()
+    }
+
+    const Package = await PackageInfo.findOne({ 
         order:[["id","DESC"]],
         limit : 1,
+        where:{
+            Tracking_Number : {
+                [Sequelize.Op.ne]: null
+            }
+        }
      })
+
     var Number
     var NumberString
     var Today = new Date(Date.now())
-    if(Package.length === 0){
+
+    if(!Package){
        Number = 0
-    }else if(new Date(Package[0].dataValues.createdAt.getFullYear(), Package[0].dataValues.createdAt.getMonth() ,Package[0].dataValues.createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
-          Number = 0;
-   }
-        
-   if(Package.length === 1){
-       NumberString = `${Package[0].Tracking_Number}`.split("-")[1]
-       Number = parseInt(NumberString.slice(-4)) + 1
-   }
-    const packagesInfoArr = []
-     req.body.Package_Seccuss.forEach(el => {
-         
-         el.UserId = req.user.id
-         el.Customer = req.user.id
-         el.First_Provider  = req.body.Shipment_Provider_Id
-         el.Tracking_Number = `DX-${Today.getFullYear()}${MonthString(Today.getMonth())}${MonthString(Today.getDate())}${ToforeNumberString(Number)}`
-         packagesInfoArr.push(el)
-         Number++
-     })
-    
-     const PackageInfoResult = await PackageInfo.bulkCreate(packagesInfoArr , {validate : true})
+    }else if(new Date(Package.createdAt.getFullYear(), Package.createdAt.getMonth() ,Package.createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
+        Number = 0;
+    }   
+    if(Package){
+        NumberString = `${Package.Tracking_Number}`.split("-")[1]
+        Number = parseInt(NumberString.slice(-4)) + 1
+    }
 
-     const Status = await PackageStatus.findOne({where:{id : 1}})
-     const Actions = await Action.findOne({where:{id:1}})
-     const PayMethod = await PaymentMethod.findOne({where:{id:1}})
-     const Workflows = await Workflow.findOne({where:{id : 1}})
-     const PackageDeliArr = []
-        PackageInfoResult.forEach(el => {
-               var PackageObject = {}
-               PackageObject.Package_id = el.id
-               PackageObject.Shipment_Provider = req.body.Shipment_Provider_Id
-               PackageObject.Package_Action = Actions.Action_Name
-               PackageObject.Package_Workflow = Workflows.Workflow_Name
-               PackageObject.Package_Status = Status.Status_Name
-               PackageObject.Payment_Method = PayMethod.Payment_Method
-               PackageObject.Amount_To_Collect = el.Price
-               PackageDeliArr.push(PackageObject)
+
+    req.SuccessPackage.forEach(async(el,i)=>{
+        await el.update({
+            UploadId : Upload.id,
+            Tracking_Number: `DX-${Today.getFullYear()}${Tracking.MonthString(Today.getMonth())}${Tracking.MonthString(Today.getDate())}${Tracking.ToforeNumberString(Number + i)}`
         })
+        if(i === req.SuccessPackage.length - 1){
+            next();
+        }
+    })
 
-     const Package_Delivery = await PackageDelivery.bulkCreate(PackageDeliArr , {validate: true})
-     const Package_History = await PackageHistory.bulkCreate(PackageDeliArr , {validate: true})
+})
 
 
 
-     res.status(201)
-     .json({
-         status : "Seccuss",
-         Upload
-     })
-});
-
+exports.UploadRenderResponse = ErorrCache.ErrorCatchre(async(req,res,next)=>{
+    res.status(201)
+    .json({
+        Status: "Success",
+        Data:{
+         Upload   : req.Upload,
+         LogsData : req.LogsArray
+        }    
+    })
+})
 
 exports.getLastUploadlast = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     const Fullpackege = await req.user.getUploads({
@@ -136,26 +167,56 @@ exports.getLastUploadlast = ErorrCache.ErrorCatchre(async (req,res,next)=>{
 })
 
 
-exports.getPakegesByUser = ErorrCache.ErrorCatchre(async (req,res,next)=>{
-    const allFullPackege = await req.user.getUploads();
-    let allPackege = []
-    let Ids = []
+exports.getPakeges = ErorrCache.ErrorCatchre(async (req,res,next)=>{
+    req.allFullPackege
+    req.allHistory = []
+    if (req.user.Role === "Customer") {
+        req.allFullPackege = await req.user.getPackagesInfos({
+            where:{
+                Tracking_Number : {
+                    [Sequelize.Op.like] : `%${req.query.Tracking_Number}%`
+                }
+            },
+            order:[['id']]
+        });
 
-    allFullPackege.forEach(element => {
-        Ids.push(element.id);
-       element.getPackeges().then(data => {
-           allPackege.push(data);
+    }else{
+        req.allFullPackege = await PackageInfo.findAll({
+            where:{
+                Tracking_Number : {
+                    [Sequelize.Op.like]: `%${req.query.Tracking_Number}%`
+                }
+            },
+            order:[['id']]
+        })
+    }
 
-       }).catch(err =>  console.log(err))
+    req.allFullPackege.forEach(async (el,i) => {
+        try{
 
-    });
+            let PackagesHistory = await PackageHistory.findAll({
+                where : {
+                    Package: el.id
+                },
+                order:[['id']]
+            })
+            req.allHistory.push(PackagesHistory)
+            if(i === req.allFullPackege.length - 1){
+                next()
+            } 
+        }catch(err){
+            console.error(err)
+        }
+    })    
 
-
-    res.status(200)
-    .json({
-        status : "Seccuss",
-        body: Ids
-    })
 })
 
 
+exports.RenderPackageSearch = ErorrCache.ErrorCatchre(async (req,res,next)=>{
+    res.status(200)
+    .json({
+        status : "Seccuss",
+        allFullPackege : req.allFullPackege,
+        allHistory : req.allHistory
+    })
+})

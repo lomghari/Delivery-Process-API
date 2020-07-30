@@ -44,7 +44,8 @@ Upload.init({
     {
         sequelize,
         modelName:"Upload",
-        tableName:"Upload_History"
+        tableName:"Upload_History",
+        updatedAt: false
     }
 )
 

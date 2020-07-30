@@ -41,15 +41,121 @@ const PaymentMethodArry = [{Payment_Method :"CashOnDelivery"}]
 
 
 
-
+//Association Between User-ShipmentProvader Table
 User.belongsToMany(ShipmentProvider,{through: "User_ShipmentProvider"});
 ShipmentProvider.belongsToMany(User,{through: "User_ShipmentProvider"});
 
-Upload.belongsTo(User,{constraints:true,onDelete: "CASCADE"})
-User.hasMany(Upload)
+//Association between User-Upload table
+User.hasMany(Upload,{foreignKey:"Custumer"})
+Upload.belongsTo(User,{foreignKey:"Custumer"})
 
-PackagesInfo.belongsTo(User,{constraints: true,onDelete:"CASCADE", foreignKey:"Customer"})
-User.hasMany(PackagesInfo)
+//Association Between Upload-PackageInfo
+Upload.hasMany(PackagesInfo,{foreignKey:"UploadId"})
+PackagesInfo.belongsTo(Upload,{foreignKey:"UploadId"})
+
+//Association between User-PackageInfo
+User.hasMany(PackagesInfo,{foreignKey:"Custumer"})
+PackagesInfo.belongsTo(User,{foreignKey:"Custumer"})
+
+//Association Between PackageInfo-PackageDelivery
+PackagesInfo.hasOne(PackagesDelivery,{foreignKey:"Package"})
+PackagesDelivery.belongsTo(PackagesInfo,{foreignKey:"Package"})
+
+//Association Between PackageInfo-PackageHistory
+PackagesInfo.hasMany(PackagesHistory,{foreignKey:"Package"})
+PackagesHistory.belongsTo(PackagesInfo,{foreignKey:"Package"})
+
+//PackageDelivery Proccess 
+Action.hasMany(PackagesDelivery,{foreignKey:{
+    name:"Package_Action",
+    defaultValue: 1
+}})
+PackagesDelivery.belongsTo(Action, {onDelete:true,foreignKey:{
+    name:"Package_Action",
+    defaultValue: 1
+}})
+
+ShipmentProvider.hasMany(PackagesDelivery,{foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+PackagesDelivery.belongsTo(ShipmentProvider,{onDelete:true,foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+
+PaymentMethod.hasMany(PackagesDelivery, {foreignKey:{
+    name:"Payment_Method",
+    defaultValue: 1
+}})
+PackagesDelivery.belongsTo(PaymentMethod , {onDelete:true,foreignKey:{
+    name:"Payment_Method",
+    defaultValue: 1
+}})
+
+Workflow.hasMany(PackagesDelivery, {foreignKey : {
+    name:"Package_Workflow",
+    defaultValue: 1
+}})
+PackagesDelivery.belongsTo(Workflow, {onDelete:true,foreignKey : {
+    name:"Package_Workflow",
+    defaultValue: 1
+}})
+
+PackagesStatus.hasMany(PackagesDelivery,{foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+PackagesDelivery.belongsTo(PackagesStatus, {onDelete:true,foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+
+//PackageHistory Proccess 
+Action.hasMany(PackagesHistory,{foreignKey:{
+    name:"Package_Action",
+    defaultValue: 1
+}})
+PackagesHistory.belongsTo(Action,{onDelete:true,foreignKey:{
+    name:"Package_Action",
+    defaultValue: 1
+}})
+
+ShipmentProvider.hasMany(PackagesHistory,{foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+PackagesHistory.belongsTo(ShipmentProvider,{onDelete:true,foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+
+PaymentMethod.hasMany(PackagesHistory, {foreignKey:{
+    name:"Payment_Method",
+    defaultValue: 1
+}})
+PackagesHistory.belongsTo(PaymentMethod , {onDelete:true,foreignKey:{
+    name:"Payment_Method",
+    defaultValue: 1
+}})
+
+Workflow.hasMany(PackagesHistory, {foreignKey : {
+    name:"Package_Workflow",
+    defaultValue: 1
+}})
+PackagesHistory.belongsTo(Workflow, {onDelete:true,foreignKey : {
+    name:"Package_Workflow",
+    defaultValue: 1
+}})
+
+PackagesStatus.hasMany(PackagesHistory,{foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
+PackagesHistory.belongsTo(PackagesStatus, {onDelete:true,foreignKey:{
+    name:"Shipment_Provider",
+    defaultValue: 1
+}})
 
 
 
