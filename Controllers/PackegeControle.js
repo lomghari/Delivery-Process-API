@@ -171,26 +171,71 @@ exports.getPakeges = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     req.allFullPackege
     req.allHistory = []
     if (req.user.Role === "Customer") {
-        req.allFullPackege = await req.user.getPackagesInfos({
-            where:{
-                Tracking_Number : {
-                    [Sequelize.Op.like] : `%${req.query.Tracking_Number}%`
-                }
-            },
-            order:[['id']]
-        });
-
+      if(req.query.Tracking_Number){
+          req.query.Tracking_Number
+              req.allFullPackege = await req.user.getPackagesInfos({
+                  where:{
+                      Tracking_Number : {
+                          [Sequelize.Op.like] : `%${req.query.Tracking_Number}%`
+                      }
+                  },
+                  order:[['id']]
+              });
+       }
+       if(req.query.Referance){
+               req.allFullPackege = await req.user.getPackagesInfos({
+                   where:{
+                       Referance : {
+                           [Sequelize.Op.like] : `%${req.query.Referance}%`
+                       }
+                   },
+                   order:[['id']]
+               });
+       }
+        if(req.query.Phone_Number){
+            req.allFullPackege = await req.user.getPackagesInfos({
+                where:{
+                    Phone_Number : {
+                        [Sequelize.Op.like] : `%${req.query.Phone_Number}%`
+                    }
+                },
+                order:[['id']]
+            });
+        }       
     }else{
-        req.allFullPackege = await PackageInfo.findAll({
-            where:{
-                Tracking_Number : {
-                    [Sequelize.Op.like]: `%${req.query.Tracking_Number}%`
-                }
-            },
-            order:[['id']]
-        })
+        if(req.query.Tracking_Number){
+            req.query.Tracking_Number
+                req.allFullPackege = await PackageInfo.findAll({
+                    where:{
+                        Tracking_Number : {
+                            [Sequelize.Op.like] : `%${req.query.Tracking_Number}%`
+                        }
+                    },
+                    order:[['id']]
+                });
+         }
+         if(req.query.Referance){
+                 req.allFullPackege = await PackageInfo.findAll({
+                     where:{
+                         Referance : {
+                             [Sequelize.Op.like] : `%${req.query.Referance}%`
+                         }
+                     },
+                     order:[['id']]
+                 });
+         }
+          if(req.query.Phone_Number){
+              req.allFullPackege = await PackageInfo.findAll({
+                  where:{
+                      Phone_Number : {
+                          [Sequelize.Op.like] : `%${req.query.Phone_Number}%`
+                      }
+                  },
+                  order:[['id']]
+              });
+          }       
     }
-
+    
     req.allFullPackege.forEach(async (el,i) => {
         try{
 

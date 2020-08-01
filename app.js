@@ -11,6 +11,7 @@ app.use(express.json());
 app.use("/public", express.static(path.join(__dirname, 'Public')));
 app.use(morgan());
 app.use(compression());
+  
 
 const RouteUser = require("./Routes/UserRoute");
 const RoutePackege = require("./Routes/PackegeRoute")
