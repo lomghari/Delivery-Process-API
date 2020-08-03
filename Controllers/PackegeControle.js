@@ -169,7 +169,7 @@ exports.getLastUploadlast = ErorrCache.ErrorCatchre(async (req,res,next)=>{
 
 exports.getPakeges = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     req.allFullPackege
-    req.allHistory = []
+    req.allHistory = {}
     if (req.user.Role === "Customer") {
       if(req.query.Tracking_Number){
           req.query.Tracking_Number
@@ -245,7 +245,7 @@ exports.getPakeges = ErorrCache.ErrorCatchre(async (req,res,next)=>{
                 },
                 order:[['id']]
             })
-            req.allHistory.push(PackagesHistory)
+            req.allHistory[el.id] = PackagesHistory
             if(i === req.allFullPackege.length - 1){
                 next()
             } 
