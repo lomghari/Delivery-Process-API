@@ -9,7 +9,7 @@ RoutePackege.route("/insertmany").post(AuthControle.Checker,PackegeControle.Inse
 RoutePackege.route("/getLastUpdate").get(AuthControle.Checker,PackegeControle.getLastUploadlast)
 
 
-RoutePackege.route("/getpackege").get(AuthControle.Checker,PackegeControle.getPakeges,PackegeControle.RenderPackageSearch)
+RoutePackege.route("/getpackege").get(AuthControle.Checker,PackegeControle.getPakeges,PackegeControle.ProssecingPackageHestory,PackegeControle.RenderPackageSearch)
 
 
 module.exports = RoutePackege;

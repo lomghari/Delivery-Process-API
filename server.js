@@ -103,13 +103,15 @@ PackagesDelivery.belongsTo(Workflow, {onDelete:true,foreignKey : {
 }})
 
 PackagesStatus.hasMany(PackagesDelivery,{foreignKey:{
-    name:"Shipment_Provider",
+    name:"Package_Status",
     defaultValue: 1
 }})
 PackagesDelivery.belongsTo(PackagesStatus, {onDelete:true,foreignKey:{
-    name:"Shipment_Provider",
+    name:"Package_Status",
     defaultValue: 1
 }})
+PackagesDelivery.belongsTo(User, {foreignKey:"UpdateBy"})
+User.hasMany(PackagesDelivery, {foreignKey:"UpdateBy"})
 
 //PackageHistory Proccess 
 Action.hasMany(PackagesHistory,{foreignKey:{
@@ -149,13 +151,16 @@ PackagesHistory.belongsTo(Workflow, {onDelete:true,foreignKey : {
 }})
 
 PackagesStatus.hasMany(PackagesHistory,{foreignKey:{
-    name:"Shipment_Provider",
+    name:"Package_Status",
     defaultValue: 1
 }})
 PackagesHistory.belongsTo(PackagesStatus, {onDelete:true,foreignKey:{
-    name:"Shipment_Provider",
+    name:"Package_Status",
     defaultValue: 1
 }})
+
+PackagesHistory.belongsTo(User, {foreignKey:"UpdateBy"})
+User.hasMany(PackagesHistory, {foreignKey:"UpdateBy"})
 
 
 

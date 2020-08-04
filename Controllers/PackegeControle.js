@@ -45,12 +45,14 @@ exports.InsertInDelivryAndHistory = ErorrCache.ErrorCatchre(async(req,res,next) 
      req.SuccessPackage.forEach(async(el,i)=>{
          await el.createPackagesDelivery({
             Shipment_Provider: req.body.Shipment_Provider_Id,
-            Amount_To_Collect: el.Price  
+            Amount_To_Collect: el.Price,
+            UpdateBy: req.user.id 
          })
 
          await el.createPackagesHistory({
             Shipment_Provider: req.body.Shipment_Provider_Id,
-            Amount_To_Collect: el.Price 
+            Amount_To_Collect: el.Price,
+            UpdateBy: req.user.id
          })
 
         if(i === req.SuccessPackage.length - 1){
@@ -245,6 +247,7 @@ exports.getPakeges = ErorrCache.ErrorCatchre(async (req,res,next)=>{
                 },
                 order:[['id']]
             })
+
             req.allHistory[el.id] = PackagesHistory
             if(i === req.allFullPackege.length - 1){
                 next()
@@ -256,12 +259,53 @@ exports.getPakeges = ErorrCache.ErrorCatchre(async (req,res,next)=>{
 
 })
 
+exports.ProssecingPackageHestory = ErorrCache.ErrorCatchre( async (req, res, next)=>{
+    req.PackagesHistoryPross = {}
+    for (const el in req.allHistory) {
+        req.PackagesHistoryPross[el] = []
+        req.allHistory[el].forEach( async (element , i) => {
+            try {
+               var PackageHistoryToSend = {}
+               var statusName = await element.getPackagesStatus()
+               var WorkflowName = await element.getWorkflow()
+               var usernames = await element.getUser()
+               var PaymentMethodName = await element.getPaymentMethod()
+               var HubName = await element.getShipmentProvider()
+               var ActionName = await element.getAction()
+
+               
+               PackageHistoryToSend.Amount_To_Collect = element.Amount_To_Collect
+               PackageHistoryToSend.Delivery_Run_Number = element.Delivery_Run_Number
+               PackageHistoryToSend.Driver = element.Driver
+               PackageHistoryToSend.Attempts = element.Attempts
+               PackageHistoryToSend.Master_Bag_Number = element.Master_Bag_Number
+               PackageHistoryToSend.Location = element.Location
+               PackageHistoryToSend.createdAt = element.createdAt
+               PackageHistoryToSend.Package_Action = ActionName.Action_Name
+               PackageHistoryToSend.Shipment_Provider = HubName.Provider_Name
+               PackageHistoryToSend.Payment_Method = PaymentMethodName.Payment_Method
+               PackageHistoryToSend.Package_Workflow = WorkflowName.Workflow_Name
+               PackageHistoryToSend.UpdateBy = usernames.Username
+               PackageHistoryToSend.Package_Status = statusName.Status_Name
+
+               req.PackagesHistoryPross[el].push(PackageHistoryToSend)
+
+               if(el === Object.keys(req.allHistory)[Object.keys(req.allHistory).length - 1] && i === req.allHistory[el].length - 1 ){
+                next()
+               }
+            } catch (error) {
+                console.log(error)
+            }
+        })
+    }
+})
+
 
 exports.RenderPackageSearch = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     res.status(200)
     .json({
         status : "Seccuss",
         allFullPackege : req.allFullPackege,
-        allHistory : req.allHistory
+        allHistory : req.PackagesHistoryPross
     })
 })
