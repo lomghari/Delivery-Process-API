@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 const User = require("../Models/UserModel");
+const ShipmentProvader = require("../Models/ShipmentProviderModel")
 const ErorrCache = require("../Util/ErrorCatch");
 const Errors = require("../Util/ErrorAPI");
 
@@ -15,26 +16,26 @@ const SignToken = id => {
 
 exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
 
-    const username = req.body.username;
-    const fullname = req.body.fullname;
-    const role = req.body.role;
-    const email = req.body.email;
     const password = await bcrypt.hash(req.body.password,12);
     const newUser =  await User.create
     ({
-        Username: username,
-        Email : email,
-        Full_Name: fullname,
+        Username: req.body.username,
+        Email : req.body.email,
+        Full_Name: req.body.fullname,
         Password:password,
-        Role:role
+        Role:req.body.role
+        
     });
 
-
- const token = await SignToken(newUser.id)
-   res.cookie("jwt",token,{
-     expires :  new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-     httpOnly : true
-   })
+    const AllHub = await ShipmentProvader.findAll()
+    if(AllHub){
+      await newUser.setShipmentProviders(AllHub)
+    }
+    const token = await SignToken(newUser.id)
+    res.cookie("jwt",token,{
+      expires :  new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+      httpOnly : true
+    })
 
  res.status(201).
     json
@@ -43,6 +44,7 @@ exports.singUp = ErorrCache.ErrorCatchre(async(req,res,next) =>{
         token
     })
 });
+
 
 
 exports.LogIn = ErorrCache.ErrorCatchre(async(req,res,next)=>{

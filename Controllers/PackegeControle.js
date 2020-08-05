@@ -2,7 +2,6 @@ const Sequelize = require("sequelize");
 const XLSX = require("xlsx")
 const ErorrCache = require("../Util/ErrorCatch");
 const Errors = require("../Util/ErrorAPI");
-const Packege = require("../Models/PackegeModel");
 const PackageInfo = require("../Models/PackagesInfoModel")
 const PackageDelivery = require("../Models/PackagesDeliveryModel")
 const PackageHistory = require("../Models/PackagesHistoryModel")
