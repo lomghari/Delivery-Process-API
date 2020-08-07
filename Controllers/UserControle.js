@@ -49,3 +49,13 @@ exports.CreateUser = ErrorCatch.ErrorCatchre( async (req,res,next)=>{
         Status : "Seccess"
     })
 })
+
+
+exports.UpdateUser = ErrorCatch.ErrorCatchre(async (req,res,next) => {
+
+    await req.user.update(req.body)
+    res.status(200)
+    .json({
+        Status : "Seccess"
+    })
+})
