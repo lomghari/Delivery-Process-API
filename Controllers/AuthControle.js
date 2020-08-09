@@ -90,7 +90,13 @@ exports.Checker = ErorrCache.ErrorCatchre(async(req,res,next) =>
   }
 
   const decode = await util.promisify(JWT.verify)(token,process.env.JWT_SICRIT);
-  const user = await User.findOne({where : {id : decode.id}});
+  const user = await User.findOne(
+    {
+      where : {id : decode.id},
+      attributes: {
+        exclude: ['Password']
+      }
+    });
    
     if(!user){
         return next(new Errors("This dosen't exist in more!",401));

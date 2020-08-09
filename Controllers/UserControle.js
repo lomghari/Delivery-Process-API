@@ -7,11 +7,19 @@ const ErrorCatch = require("../Util/ErrorCatch");
 
 
 exports.getUser =ErrorCatch.ErrorCatchre(async(req,res,next)=>{
-    const user = await User.findOne({where:{Username : req.user.dataValues.Username}})
+    const user = await User.findOne(
+        {
+            where:
+            {
+                Username : req.user.dataValues.Username
+            },
+            attributes: {
+                exclude: ['Password']
+            }
+        })
     await user.update({
         Last_Login : Date.now()
     })
-    user.Password = undefined
     res.status(200)
     .json({
         Status: "Seccess",
@@ -59,3 +67,60 @@ exports.UpdateUser = ErrorCatch.ErrorCatchre(async (req,res,next) => {
         Status : "Seccess"
     })
 })
+
+exports.getAllUser = ErrorCatch.ErrorCatchre(async (req,res,next)=> {
+    const Users = await User.findAll({
+        attributes: {
+            exclude: ['Password']
+        }
+    })
+
+    res.status(200)
+    .json({
+        Status: "Seccess",
+        Users
+    })
+})
+
+exports.DesactiveUser = ErrorCatch.ErrorCatchre(async (req,res,next)=>{
+ const user = await User.findOne({
+        where: {
+            id: req.body.id
+        }
+    })
+  user.Status = false
+            await user.save()
+  res.status(200)
+  .json({
+      status: 'Seccess'
+  })
+})
+
+
+exports.ActiveUser = ErrorCatch.ErrorCatchre(async (req,res,next)=>{
+    const user = await User.findOne({
+           where: {
+               id: req.body.id
+           }
+       })
+     user.Status = true
+               await user.save()
+     res.status(200)
+     .json({
+         status: 'Seccess'
+     })
+   })
+
+   exports.DeleteUser = ErrorCatch.ErrorCatchre(async (req,res,next)=>{
+    const user = await User.findOne({
+           where: {
+               id: req.body.id
+           }
+       })
+    await user.destroy()
+     res.status(200)
+     .json({
+         status: 'Seccess'
+     })
+   })
+   

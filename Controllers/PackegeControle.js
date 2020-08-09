@@ -113,17 +113,15 @@ exports.Upload = ErorrCache.ErrorCatchre(async (req,res,next)=>{
             }
         }
      })
-
     var Number
     var NumberString
     var Today = new Date(Date.now())
-
-    if(!Package){
+    console.log(Today.getMonth())
+    if(Package === null){
        Number = 0
     }else if(new Date(Package.createdAt.getFullYear(), Package.createdAt.getMonth() ,Package.createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
         Number = 0;
-    }   
-    if(Package){
+    }else{
         NumberString = `${Package.Tracking_Number}`.split("-")[1]
         Number = parseInt(NumberString.slice(-4)) + 1
     }
@@ -132,7 +130,7 @@ exports.Upload = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     req.SuccessPackage.forEach(async(el,i)=>{
         await el.update({
             UploadId : Upload.id,
-            Tracking_Number: `DX-${Today.getFullYear()}${Tracking.MonthString(Today.getMonth())}${Tracking.MonthString(Today.getDate())}${Tracking.ToforeNumberString(Number + i)}`
+            Tracking_Number: `DX-${Today.getFullYear()}${Tracking.MonthString(Today.getMonth() + 1)}${Tracking.MonthString(Today.getDate())}${Tracking.ToforeNumberString(Number + i)}`
         })
         if(i === req.SuccessPackage.length - 1){
             next();
