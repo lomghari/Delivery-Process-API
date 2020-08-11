@@ -73,7 +73,10 @@ exports.getAllUser = ErrorCatch.ErrorCatchre(async (req,res,next)=> {
         attributes: {
             exclude: ['Password']
         },
-        include: ShipmentProvider
+        include: {
+            model: ShipmentProvader,
+            required: true
+        }
     })
 
     res.status(200)
