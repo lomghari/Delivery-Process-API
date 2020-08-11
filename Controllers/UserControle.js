@@ -72,7 +72,8 @@ exports.getAllUser = ErrorCatch.ErrorCatchre(async (req,res,next)=> {
     const Users = await User.findAll({
         attributes: {
             exclude: ['Password']
-        }
+        },
+        include: ShipmentProvider
     })
 
     res.status(200)
