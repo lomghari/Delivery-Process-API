@@ -85,7 +85,20 @@ exports.getAllUser = ErrorCatch.ErrorCatchre(async (req,res,next)=> {
         Users
     })
 })
+exports.UpdateUsers = ErrorCatch.ErrorCatchre(async (req, res, next)=>{
+    const UserUpdate = await User.findOne({
+        where: {
+            id: req.body.Ids
+        }
+    })
+    await UserUpdate.update(req.body)
 
+    res.status(200)
+    .json({
+        status: 'Seccess',
+        UserUpdate
+    })
+})
 exports.DesactiveUser = ErrorCatch.ErrorCatchre(async (req,res,next)=>{
  const user = await User.findOne({
         where: {
