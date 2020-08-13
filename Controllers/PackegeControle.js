@@ -63,6 +63,7 @@ exports.InsertInDelivryAndHistory = ErorrCache.ErrorCatchre(async(req,res,next) 
 
 
 exports.LogFileCreation = ErorrCache.ErrorCatchre(async (req,res,next) => {
+    req.LogsArray = []
     if(req.DuplicateArray.length === 0 && req.body.Package_Logs.length === 0){
         return next()
     }
@@ -72,10 +73,7 @@ exports.LogFileCreation = ErorrCache.ErrorCatchre(async (req,res,next) => {
         element.Tracking_Number = undefined
         element.Logs = "Package Duplicated"
     })
-    if(req.body.Package_Logs.length !== 0) {
         req.LogsArray = [...req.DuplicateArray,...req.body.Package_Logs]
-    }
-    req.LogsArray = [...req.DuplicateArray]
     //  if(req.body.Total_Failer_Packages > 0 ){
     //      var wb = XLSX.utils.book_new()
     //      var ws = XLSX.utils.json_to_sheet(req.body.Package_Logs)
