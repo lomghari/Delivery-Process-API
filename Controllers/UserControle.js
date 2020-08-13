@@ -91,7 +91,7 @@ exports.UpdateUsers = ErrorCatch.ErrorCatchre(async (req, res, next)=>{
             id: req.body.Ids
         }
     })
-    if(req.body.AddHubs.length > 0) {
+    if(req.body.AddHubs.length !== 0) {
         const AllHub = await ShipmentProvader.findAll({
             where:{
                id:{
@@ -103,11 +103,11 @@ exports.UpdateUsers = ErrorCatch.ErrorCatchre(async (req, res, next)=>{
         await UserUpdate.addShipmentProviders(AllHub)
     }
 
-    if(req.body.RemovedHubs.length > 0) {
+    if(req.body.RemovedHubs.length !== 0) {
         const AllHubR = await ShipmentProvader.findAll({
             where:{
                id:{
-                   [Sequelize.Op.in] : req.body.AddHubs
+                   [Sequelize.Op.in] : req.body.RemovedHubs
                }
             }
         })
