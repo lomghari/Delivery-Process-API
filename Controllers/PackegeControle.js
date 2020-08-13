@@ -117,7 +117,7 @@ exports.Upload = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     var NumberString
     var Today = new Date(Date.now())
     console.log(Today.getMonth())
-    if(Package === null){
+    if(!Package){
        Number = 0
     }else if(new Date(Package.createdAt.getFullYear(), Package.createdAt.getMonth() ,Package.createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
         Number = 0;
