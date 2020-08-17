@@ -115,7 +115,9 @@ exports.UpdateUsers = ErrorCatch.ErrorCatchre(async (req, res, next)=>{
         await UserUpdate.removeShipmentProviders(AllHubR)
     }
 
-    await UserUpdate.update(req.body.User)
+    const UpdatedUser = await UserUpdate.update(req.body.User)
+    const HubsUser = await UpdatedUser.getShipmentProviders()
+    await UpdatedUser.update({Current_Provider: HubsUser[0]})
 
     res.status(200)
     .json({

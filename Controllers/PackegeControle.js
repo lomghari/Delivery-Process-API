@@ -6,7 +6,7 @@ const PackageInfo = require("../Models/PackagesInfoModel")
 const PackageDelivery = require("../Models/PackagesDeliveryModel")
 const PackageHistory = require("../Models/PackagesHistoryModel")
 const Tracking = require("../Util/Tracking_Number");
-const { json } = require("sequelize");
+const { sync } = require("../Models/PackagesInfoModel");
 
 
 exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{   
@@ -305,6 +305,60 @@ exports.ProssecingPackageHestory = ErorrCache.ErrorCatchre( async (req, res, nex
     }
 })
 
+exports.GetPendingPackage = ErorrCache.ErrorCatchre(async (req, res, next) => {
+    const Packages = await PackageDelivery.findAll({
+        where: {
+            Package_Status: 1
+        },
+        order: [['createdAt','DESC']],
+        attributes: ['id','UpdateBy','Package_Status','createdAt']
+        
+    })
+    if (!Packages) {
+      return next(new Errors("Package Pending Dosent Found",400))
+    }
+
+    res.status(200)
+    .json({
+        Status: "Seccuss",
+        Packages
+    })
+})
+
+
+exports.UpdatePackagesStatus = ErorrCache.ErrorCatchre( async (req,res,next) => {
+    console.log("hola") 
+    const Packages = await PackageInfo.findAll({
+        where: {
+            id:{
+                [Sequelize.Op.in] : req.body.PackagesToChange
+            }
+        }
+    })
+    Packages.forEach( async (el, i ) => {
+     const packageDelivry = await el.getPackagesDelivery()
+     const PackageDeliveryUpdate = await packageDelivry.update({
+        Package_Status :req.body.PackageStatus ,
+        UpdateBy: req.user.id,
+        Driver: req.body.Driver
+      })
+      PackageDeliveryUpdate.dataValues.createdAt = undefined
+      PackageDeliveryUpdate.dataValues.updatedAt = undefined
+      PackageDeliveryUpdate.dataValues.id = undefined
+      await el.createPackagesHistory(PackageDeliveryUpdate.dataValues)
+
+      if(i === Packages.length - 1) {
+        next()
+      }
+    })
+})
+
+exports.UpdatePackagesStatusRes = ErorrCache.ErrorCatchre( async (req, res, next) =>{
+    res.status(200)
+    .json({
+        Status: 'Seccuss'
+    })
+})
 
 exports.RenderPackageSearch = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     res.status(200)
