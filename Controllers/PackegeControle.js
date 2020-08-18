@@ -306,54 +306,69 @@ exports.ProssecingPackageHestory = ErorrCache.ErrorCatchre( async (req, res, nex
 })
 
 exports.GetPendingPackage = ErorrCache.ErrorCatchre(async (req, res, next) => {
-    const Packages = await PackageDelivery.findAll({
+    req.Packages = null
+    req.Packages = await PackageDelivery.findAll({
         where: {
             Package_Status: 1
         },
         order: [['createdAt','DESC']],
-        attributes: ['id','UpdateBy','Package_Status','createdAt']
+        attributes: ['id','UpdateBy','Package_Status','createdAt','Package']
         
     })
-    if (!Packages) {
+    if (!req.Packages) {
       return next(new Errors("Package Pending Dosent Found",400))
     }
-     
-     const UserIdDuplicate = Packages.map(el =>{
-       return el.UpdateBy
-     })
+    req.PackagesInfo = []
 
-     const UserId = UserIdDuplicate.reduce((acc, el) => {
-        if(acc.indexOf(el) === -1) {
-            acc.push(el)
+    req.Packages.forEach(async (el, i) =>{
+        var PackageInfo = await el.getPackagesInfo()
+        
+        req.Packages[i].dataValues.Tracking_Number = PackageInfo.Tracking_Number
+        
+        if( i === req.Packages.length - 1) {
+            next()
         }
-        return acc
-     },[])
+    })
+     
+})
 
+exports.getGetPendingPackageAfterProccessing = ErorrCache.ErrorCatchre(async (req,res,next) => {
+    const UserIdDuplicate = req.Packages.map(el =>{
+      return el.UpdateBy
+    })
+    
+    const UserId = UserIdDuplicate.reduce((acc, el) => {
+       if(acc.indexOf(el) === -1) {
+           acc.push(el)
+       }
+       return acc
+    },[])
+    
     const Users = await User.findAll({
-        where: {
-            id: {
-                [Sequelize.Op.in]: UserId
-            }
-        },
-        attributes: ['id','Username']
+       where: {
+           id: {
+               [Sequelize.Op.in]: UserId
+           }
+       },
+       attributes: ['id','Username']
     }) 
     
-    const PackagesAfterProssecing = Packages.reduce((crr, el) => {
-      let key = el["UpdateBy"]
-      if(!crr[key]){
-          crr[key] = []
-      }
-      crr[key].push(el)
-      return crr
+    const PackagesAfterProssecing = req.Packages.reduce((crr, el) => {
+     let key = el["UpdateBy"]
+     if(!crr[key]){
+         crr[key] = []
+     }
+     crr[key].push(el)
+     return crr
     },{})
     res.status(200)
     .json({
-        Status: "Seccuss",
-        Users,
-        PackagesAfterProssecing
+       Status: "Seccuss",
+       Users,
+       PackagesAfterProssecing
     })
-})
 
+})
 
 exports.UpdatePackagesStatus = ErorrCache.ErrorCatchre( async (req,res,next) => { 
     const Packages = await PackageInfo.findAll({

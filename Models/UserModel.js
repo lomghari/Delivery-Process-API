@@ -46,7 +46,7 @@ User.init({
          {
             type : Sequelize.ENUM
             ({
-               values : ["Customer","Admin","Operateur","Manager"]
+               values : ["Customer","Admin","Operateur","Manager",'Rider']
             }),
             allowNull :false
     

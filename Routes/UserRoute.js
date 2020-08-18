@@ -10,6 +10,6 @@ RouteUser.route("/active").patch(AuthControle.Checker,UserControle.ActiveUser)
 RouteUser.route("/desactive").patch(AuthControle.Checker,UserControle.DesactiveUser)
 RouteUser.route('/').get(AuthControle.Checker,UserControle.getAllUser).patch(AuthControle.Checker, UserControle.UpdateUsers)
 RouteUser.route("/createuser").post(AuthControle.Checker,UserControle.CreateUser)
-
+RouteUser.route("/riders").get(AuthControle.Checker, UserControle.getRider)
 
 module.exports = RouteUser;

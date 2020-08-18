@@ -166,4 +166,23 @@ exports.ActiveUser = ErrorCatch.ErrorCatchre(async (req,res,next)=>{
          status: 'Seccess'
      })
    })
+
+   exports.getRider = ErrorCatch.ErrorCatchre(async (req, res, next) => {
+       const Riders = await User.findAll({
+           where: {
+               Role: 'Rider'
+           },
+           attributes: ['Username','id']
+       })
+       
+       if (Riders.length === 0) {
+          return next(new Error("Aucan Rider in this hub",404))
+       }
+
+       res.status(200)
+       .json({
+           Status: "Success",
+           Riders
+       })
+   })
    

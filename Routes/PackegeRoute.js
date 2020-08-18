@@ -10,6 +10,6 @@ RoutePackege.route("/getLastUpdate").get(AuthControle.Checker,PackegeControle.ge
 
 
 RoutePackege.route("/getpackege").get(AuthControle.Checker,PackegeControle.getPakeges,PackegeControle.ProssecingPackageHestory,PackegeControle.RenderPackageSearch)
-RoutePackege.route("/packagestatus").get(AuthControle.Checker,PackegeControle.GetPendingPackage).put(AuthControle.Checker,PackegeControle.UpdatePackagesStatus,PackegeControle.UpdatePackagesStatusRes)
+RoutePackege.route("/packagestatus").get(AuthControle.Checker,PackegeControle.GetPendingPackage,PackegeControle.getGetPendingPackageAfterProccessing).put(AuthControle.Checker,PackegeControle.UpdatePackagesStatus,PackegeControle.UpdatePackagesStatusRes)
 
 module.exports = RoutePackege;
