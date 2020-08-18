@@ -7,6 +7,7 @@ const PackageDelivery = require("../Models/PackagesDeliveryModel")
 const PackageHistory = require("../Models/PackagesHistoryModel")
 const Tracking = require("../Util/Tracking_Number");
 const { sync } = require("../Models/PackagesInfoModel");
+const User = require("../Models/UserModel");
 
 
 exports.InsertPackeges = ErorrCache.ErrorCatchre(async(req,res,next) =>{   
@@ -116,7 +117,6 @@ exports.Upload = ErorrCache.ErrorCatchre(async (req,res,next)=>{
     var Number
     var NumberString
     var Today = new Date(Date.now())
-    console.log(Today.getMonth())
     if(!Package){
        Number = 0
     }else if(new Date(Package.createdAt.getFullYear(), Package.createdAt.getMonth() ,Package.createdAt.getDate()) < new Date(Today.getFullYear() , Today.getMonth() , Today.getDate())){
@@ -317,17 +317,45 @@ exports.GetPendingPackage = ErorrCache.ErrorCatchre(async (req, res, next) => {
     if (!Packages) {
       return next(new Errors("Package Pending Dosent Found",400))
     }
+     
+     const UserIdDuplicate = Packages.map(el =>{
+       return el.UpdateBy
+     })
 
+     const UserId = UserIdDuplicate.reduce((acc, el) => {
+        if(acc.indexOf(el) === -1) {
+            acc.push(el)
+        }
+        return acc
+     },[])
+
+    const Users = await User.findAll({
+        where: {
+            id: {
+                [Sequelize.Op.in]: UserId
+            }
+        },
+        attributes: ['id','Username']
+    }) 
+    
+    const PackagesAfterProssecing = Packages.reduce((crr, el) => {
+      let key = el["UpdateBy"]
+      if(!crr[key]){
+          crr[key] = []
+      }
+      crr[key].push(el)
+      return crr
+    },{})
     res.status(200)
     .json({
         Status: "Seccuss",
-        Packages
+        Users,
+        PackagesAfterProssecing
     })
 })
 
 
-exports.UpdatePackagesStatus = ErorrCache.ErrorCatchre( async (req,res,next) => {
-    console.log("hola") 
+exports.UpdatePackagesStatus = ErorrCache.ErrorCatchre( async (req,res,next) => { 
     const Packages = await PackageInfo.findAll({
         where: {
             id:{
