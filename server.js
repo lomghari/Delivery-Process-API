@@ -181,7 +181,7 @@ const createTable = async () => {
 const app = require("./app");
 
 
-createTable();
+// createTable();
 
 app.listen(process.env.PORT || 8000,()=>{
     console.log("Server Start")
