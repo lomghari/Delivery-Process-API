@@ -307,14 +307,28 @@ exports.ProssecingPackageHestory = ErorrCache.ErrorCatchre( async (req, res, nex
 
 exports.GetPendingPackage = ErorrCache.ErrorCatchre(async (req, res, next) => {
     req.Packages = null
-    req.Packages = await PackageDelivery.findAll({
-        where: {
-            Package_Status: 1
-        },
-        order: [['createdAt','DESC']],
-        attributes: ['id','UpdateBy','Package_Status','createdAt','Package']
-        
-    })
+
+    if (req.user.Role === 'Rider') {
+        req.Packages = await PackageDelivery.findAll({
+            where: {
+                Package_Status: req.body.StatusId,
+                Drive: req.user.id
+            },
+            order: [['createdAt','DESC']],
+            attributes: ['id','UpdateBy','Package_Status','createdAt','Package']
+            
+        })
+    }else{
+        req.Packages = await PackageDelivery.findAll({
+            where: {
+                Package_Status: req.body.StatusId,
+            },
+            order: [['createdAt','DESC']],
+            attributes: ['id','UpdateBy','Package_Status','createdAt','Package']
+            
+        })
+    }
+
     if (!req.Packages) {
       return next(new Errors("Package Pending Dosent Found",400))
     }
