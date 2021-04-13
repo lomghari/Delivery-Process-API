@@ -61,14 +61,7 @@ PackagesInfo.init(
 { 
     sequelize, 
     modelName:"PackagesInfo",
-    tableName:"Packages_Info",
-    indexes:
-    [
-        {
-            unique:true,
-            fields:["Custumer" , "Referance"]
-        }
-    ]
+    tableName:"Packages_Info"
  }
 )
 

@@ -15,8 +15,7 @@ User.init({
        Username:
         {
             type: Sequelize.STRING,
-            allowNull : false,
-            unique: 'compositeIndex'
+            allowNull : false
         },
          Password:{
              type : Sequelize.STRING,
